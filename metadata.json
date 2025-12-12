@@ -1,0 +1,5 @@
+{
+  "name": "Retro Pocket Chase",
+  "description": "A classic arcade maze chase game inside a retro handheld console interface. Collect all pellets and avoid the ghosts!",
+  "requestFramePermissions": []
+}
