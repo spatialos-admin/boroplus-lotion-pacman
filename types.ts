@@ -37,6 +37,7 @@ export interface Entity {
 export interface Ghost extends Entity {
   isScared?: boolean;
   isActive?: boolean; // Whether the ghost is currently on screen
+  isEaten?: boolean; // Whether the ghost has been eliminated
 }
 
 export interface GameState {
@@ -46,4 +47,6 @@ export interface GameState {
   score: number;
   status: GameStatus;
   lives: number;
+  activeMessage: string | null;
+  messageExpireTimestamp: number;
 }
