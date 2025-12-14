@@ -16,6 +16,7 @@ export enum TileType {
   PELLET = 2,
   POWER_PELLET = 3,
   DOOR = 4,
+  GHOST_SPAWN = 9,
 }
 
 export enum GameStatus {
@@ -35,6 +36,7 @@ export interface Entity {
 
 export interface Ghost extends Entity {
   isScared?: boolean;
+  isActive?: boolean; // Whether the ghost is currently on screen
 }
 
 export interface GameState {

@@ -2,8 +2,7 @@ import React, { useEffect } from 'react';
 import { useGameLogic } from '../hooks/useGameLogic';
 import DPad from './DPad';
 import GameScreen from './GameScreen';
-import { RotateCcw, Pause } from 'lucide-react';
-import { Direction, GameStatus } from '../types';
+import { Direction } from '../types';
 
 const Gameboy: React.FC = () => {
   const { gameState, setDirection, restartGame } = useGameLogic();
@@ -24,71 +23,46 @@ const Gameboy: React.FC = () => {
   }, [setDirection, restartGame]);
 
   return (
-    <div className="relative flex flex-col items-center w-full max-w-[400px] h-auto aspect-[9/19] bg-white rounded-[3rem] shadow-2xl border-4 border-gray-300 p-5 mx-auto select-none overflow-hidden">
+    <div className="relative flex flex-col items-center w-full h-full max-w-[500px] max-h-full sm:aspect-[9/19] sm:h-auto sm:rounded-[3rem] border-0 sm:border-4 p-2 sm:p-4 mx-auto select-none overflow-hidden" style={{ 
+      minHeight: 0,
+      backgroundColor: '#0a0a0a',
+      borderColor: '#0a0a0a',
+      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
+    }}>
       {/* Top Detail (Speaker/Sensor) */}
-      <div className="w-24 h-4 bg-black rounded-full mb-4 mt-2 relative overflow-hidden flex-shrink-0">
-        <div className="absolute top-1/2 left-4 w-2 h-2 rounded-full bg-blue-900/50"></div>
-        <div className="absolute top-1/2 right-4 w-1 h-1 rounded-full bg-red-500/50"></div>
+      <div className="w-24 h-3 rounded-full mb-2 sm:mb-3 mt-1 relative overflow-hidden flex-shrink-0" style={{ backgroundColor: '#0a0a0a' }}>
+        <div className="absolute top-1/2 left-4 w-2 h-2 rounded-full" style={{ backgroundColor: '#0a0a0a' }}></div>
+        <div className="absolute top-1/2 right-4 w-1 h-1 rounded-full" style={{ backgroundColor: '#0a0a0a' }}></div>
       </div>
       
-      {/* Screen Bezel - Occupying ~60% of vertical space */}
-      <div className="w-full h-[60%] bg-gray-100 rounded-2xl p-4 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] mb-4 flex flex-col flex-shrink-0">
+      {/* Screen Bezel - Maximized for larger display */}
+      <div className="w-full flex-1 sm:rounded-2xl p-2 sm:p-3 mb-1 sm:mb-2 flex flex-col flex-shrink-0 min-h-0" style={{ 
+        backgroundColor: '#0a0a0a',
+        boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.8)',
+      }}>
         {/* The actual Game Screen */}
-        <div className="flex-1 w-full rounded-lg overflow-hidden border-4 border-gray-200 bg-gray-900 relative">
+        <div className="flex-1 w-full sm:rounded-lg overflow-hidden border-2 sm:border-4 bg-black relative" style={{ borderColor: '#0a0a0a' }}>
             <GameScreen gameState={gameState} />
             {/* Scanlines overlay */}
             <div className="absolute inset-0 scanlines pointer-events-none opacity-30"></div>
-            {/* Screen Glare */}
-            <div className="absolute top-0 right-0 w-[150%] h-full bg-gradient-to-l from-white/10 to-transparent pointer-events-none transform -skew-x-12"></div>
-        </div>
-        
-        {/* Score text under screen (LCD style) */}
-        <div className="mt-2 flex justify-between items-center px-2 flex-shrink-0">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Score</span>
-            <span className="font-mono text-gray-800 font-bold text-lg">{gameState.score.toString().padStart(5, '0')}</span>
         </div>
       </div>
 
-      {/* Controls Area */}
-      <div className="flex-1 w-full flex flex-col items-center justify-evenly pb-6 min-h-0">
+      {/* Controls Area - D-Pad only */}
+      <div className="w-full flex flex-col items-center justify-center pb-4 sm:pb-6 pt-2 sm:pt-4 flex-shrink-0" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' }}>
         
-        {/* D-Pad - Scaled to fit comfortably */}
-        <div className="scale-90 origin-center">
+        {/* D-Pad - 2x bigger */}
+        <div className="scale-[1.3] sm:scale-150 origin-center">
              <DPad onDirectionPress={setDirection} />
         </div>
 
-        {/* Action Buttons (Start/Select/Reset) */}
-        <div className="w-full flex justify-between px-8 mt-2">
-            <button 
-                onClick={restartGame}
-                className="group flex flex-col items-center gap-1 active:opacity-70 transition-opacity"
-            >
-                <div className="w-12 h-4 bg-gray-200 rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] flex items-center justify-center group-active:translate-y-[1px]">
-                     <RotateCcw size={10} className="text-gray-400" />
-                </div>
-                <span className="text-[9px] font-bold text-gray-300 tracking-wider">RESET</span>
-            </button>
-            
-             <div className="flex flex-col items-center gap-1">
-                <div className="w-12 h-4 bg-gray-200 rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)] flex items-center justify-center">
-                    {/* Decorative speaker holes */}
-                    <div className="flex gap-1">
-                        <div className="w-0.5 h-0.5 bg-gray-400 rounded-full"></div>
-                        <div className="w-0.5 h-0.5 bg-gray-400 rounded-full"></div>
-                        <div className="w-0.5 h-0.5 bg-gray-400 rounded-full"></div>
-                    </div>
-                </div>
-                <span className="text-[9px] font-bold text-gray-300 tracking-wider">AUDIO</span>
-            </div>
-        </div>
-
         {/* Bottom Home Indicator area */}
-        <div className="w-32 h-1 bg-gray-200 rounded-full mt-auto opacity-50"></div>
+        <div className="w-32 h-1 rounded-full mt-4 sm:mt-6 opacity-50" style={{ backgroundColor: '#0a0a0a' }}></div>
       </div>
       
-      {/* Side buttons (Volume/Power) - Adjusted position for new height */}
-      <div className="absolute -left-[4px] top-48 w-[4px] h-16 bg-gray-300 rounded-l-md border-l border-gray-400"></div>
-      <div className="absolute -right-[4px] top-48 w-[4px] h-24 bg-gray-300 rounded-r-md border-r border-gray-400"></div>
+      {/* Side buttons (Volume/Power) - Hidden on mobile */}
+      <div className="hidden sm:block absolute -left-[4px] top-40 w-[4px] h-12 rounded-l-md border-l" style={{ backgroundColor: '#0a0a0a', borderColor: '#0a0a0a' }}></div>
+      <div className="hidden sm:block absolute -right-[4px] top-40 w-[4px] h-16 rounded-r-md border-r" style={{ backgroundColor: '#0a0a0a', borderColor: '#0a0a0a' }}></div>
     </div>
   );
 };
