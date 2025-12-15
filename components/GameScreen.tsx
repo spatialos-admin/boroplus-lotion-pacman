@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameState, TileType, GameStatus } from '../types';
 import { COLORS } from '../constants';
-import { Ghost as GhostIcon, Milk } from 'lucide-react';
+import { Ghost as GhostIcon, Milk, Play } from 'lucide-react';
 import lotionImage from '../assets/images/BP-lotion.png';
 import { ENTITY_SIZE, GHOST_SIZE, PLAYER_WIDTH, PLAYER_HEIGHT } from '../constants';
 import { getGhostTypeById } from '../ghostData';
@@ -10,9 +10,10 @@ import boroplusImage from '../assets/images/boroplus.jpeg';
 
 interface GameScreenProps {
   gameState: GameState;
+  onStart: () => void;
 }
 
-const GameScreen: React.FC<GameScreenProps> = ({ gameState }) => {
+const GameScreen: React.FC<GameScreenProps> = ({ gameState, onStart }) => {
   const { grid, player, ghosts, status, score } = gameState;
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -243,10 +244,21 @@ const GameScreen: React.FC<GameScreenProps> = ({ gameState }) => {
       )}
 
       {status === GameStatus.IDLE && (
-        <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm">
-          <p className="text-white font-bold text-xs pixel-font animate-pulse text-center leading-loose">
+        <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm flex-col gap-8">
+          <p className="text-white font-bold text-xs pixel-font animate-pulse text-center leading-loose tracking-widest">
             PRESS START<br />TO HYDRATE
           </p>
+          <button 
+            onClick={onStart}
+            className="flex items-center justify-center w-24 h-24 rounded-full active:scale-95 transition-all shadow-[inset_0_-6px_6px_rgba(0,0,0,0.5),0_6px_6px_rgba(0,0,0,0.3)] border-b-8 active:border-b-0 touch-none select-none z-50 pointer-events-auto cursor-pointer"
+            style={{
+              backgroundColor: '#61259D',
+              borderBottomColor: '#4a1d7a',
+            }}
+            aria-label="Start Game"
+          >
+            <Play className="text-white w-12 h-12 drop-shadow-md ml-2" fill="currentColor" />
+          </button>
         </div>
       )}
     </div>

@@ -5,7 +5,7 @@ import GameScreen from './GameScreen';
 import { Direction } from '../types';
 
 const Gameboy: React.FC = () => {
-  const { gameState, setDirection, restartGame } = useGameLogic();
+  const { gameState, setDirection, restartGame, startGame } = useGameLogic();
 
   // Keyboard support
   useEffect(() => {
@@ -42,7 +42,7 @@ const Gameboy: React.FC = () => {
       }}>
         {/* The actual Game Screen */}
         <div className="flex-1 w-full sm:rounded-lg overflow-hidden border-2 sm:border-4 bg-black relative" style={{ borderColor: '#0a0a0a' }}>
-          <GameScreen gameState={gameState} />
+          <GameScreen gameState={gameState} onStart={startGame} />
           {/* Scanlines overlay */}
           <div className="absolute inset-0 scanlines pointer-events-none opacity-30"></div>
         </div>

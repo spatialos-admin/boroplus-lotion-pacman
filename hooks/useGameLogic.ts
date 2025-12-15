@@ -822,5 +822,11 @@ export const useGameLogic = () => {
     };
   }, [gameState.status]);
 
-  return { gameState, setDirection, restartGame };
+  const startGame = useCallback(() => {
+    if (gameState.status === GameStatus.IDLE) {
+      setGameState(prev => ({ ...prev, status: GameStatus.PLAYING }));
+    }
+  }, [gameState.status]);
+
+  return { gameState, setDirection, restartGame, startGame };
 };
