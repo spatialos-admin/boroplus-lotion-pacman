@@ -24,10 +24,11 @@ export const ENTITY_SIZE = 5; // Base player size in blocks
 export const GHOST_SIZE = 1.5; // Ghosts are 2x2 blocks (2x bigger)
 
 // Player dimensions based on image aspect ratio (bottle is typically taller than wide)
-// Default aspect ratio for a bottle: ~0.6 (width/height) - bottle is taller
+// Player dimensions based on image aspect ratio (bottle is typically taller than wide)
+// Default aspect ratio for a bottle: ~0.4 (width/height) - bottle is taller (107x268)
 // This means if height = ENTITY_SIZE, width = ENTITY_SIZE * aspectRatio
-export const BOTTLE_ASPECT_RATIO = 0.6; // Width/Height ratio (bottle is taller)
-export const PLAYER_WIDTH = Math.max(1, Math.floor(ENTITY_SIZE * BOTTLE_ASPECT_RATIO)); // Width in blocks
+export const BOTTLE_ASPECT_RATIO = 0.4; // Width/Height ratio (bottle is taller)
+export const PLAYER_WIDTH = Math.max(1, Math.round(ENTITY_SIZE * BOTTLE_ASPECT_RATIO)); // Width in blocks
 export const PLAYER_HEIGHT = ENTITY_SIZE; // Height in blocks
 
 // Map: 1=Wall, 0=Empty, 2=Pellet, 9=GhostSpawn
