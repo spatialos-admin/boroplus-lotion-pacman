@@ -13,11 +13,11 @@ import { TileType } from './types';
  * - Text display area
  * - Ghost spawn points
  */
-export const OBSTACLE_POSITIONS: { x: number; y: number }[] = [
-  { x: 0.45, y: 0.40 },  // TOP-LEFT block
-  { x: 0.90, y: 0.30 },  // TOP-RIGHT block
-  { x: 0.45, y: 0.65 },  // BOTTOM-LEFT block
-  { x: 0.90, y: 0.65 },  // BOTTOM-RIGHT block
+export const OBSTACLE_POSITIONS: { x: number; y: number; type: 'horizontal' | 'vertical' | 'u-shape' }[] = [
+  { x: 0.0, y: 0.42, type: 'horizontal' },  // Touches Left Edge
+  { x: 1.0, y: 0.80, type: 'horizontal' },  // Touches Right Edge
+  { x: 0.82, y: 0.0, type: 'vertical' },    // Touches Top Edge
+  { x: 0.5, y: 0.5, type: 'u-shape' },      // Center
 ];
 
 export const ENTITY_SIZE = 5; // Base player size in blocks
@@ -61,7 +61,7 @@ export const generateResponsiveMapLayout = (availableWidth?: number, availableHe
   // Optimal block size range for good visibility and gameplay
   const minBlockSize = 14;
   const maxBlockSize = 50;
-  const idealBlockSize = 24;
+  const idealBlockSize = 22; // Reduced from 24 to help standard phones
 
   // Calculate aspect ratio to maintain good proportions
   const aspectRatio = availableWidth / availableHeight;
@@ -97,7 +97,8 @@ export const generateResponsiveMapLayout = (availableWidth?: number, availableHe
       (widthUtilization > 0.9 && heightUtilization > 0.9) ? 0.1 : 0;
 
     // Add bias for larger blocks to prevent tiny UI on high-res screens
-    const sizeBias = (blockSize / maxBlockSize) * 0.15;
+    // Reduced bias to avoid overly large blocks on mid-size screens
+    const sizeBias = (blockSize / maxBlockSize) * 0.08;
 
     // Add heavy bias for aspect ratio match (filling width)
     const arDiff = Math.abs((cols / rows) - aspectRatio);
@@ -325,31 +326,105 @@ const generateMapLayout = (cols: number, rows: number): number[][] => {
 
     grid.push(row);
   }
+  // Helper function to check if a wall can be placed
+  const canPlaceWall = (x: number, y: number): boolean => {
+    // Check bounds (must be within playable area, inside the outer border walls)
+    // Outer walls are at 0 and cols-1. So valid placement is 1 to cols-2.
+    if (x < 1 || x > cols - 2 || y < 1 || y > rows - 2) return false;
 
-  // Add 4 simple obstacle blocks - one on each side of the map
-  // Each block is 2x2 (4 tiles total), positioned with enough clearance for bottle (4x6)
-
-  // Helper function to place a single wall block (1 tile only)
-  const placeBlock = (x: number, y: number): void => {
-    // Skip if out of bounds (must be at least 2 tiles from border for clearance)
-    if (x <= 1 || x >= cols - 2 || y <= 1 || y >= rows - 2) return;
-
-    // Skip if in text area
+    // Check for Text Area collision
     if (y >= textAreaStartRow && y < textAreaEndRow &&
-      x >= textAreaStartCol && x < textAreaEndCol) return;
+      x >= textAreaStartCol && x < textAreaEndCol) return false;
 
-    // Skip if already a special tile
-    if (grid[y][x] === TileType.WALL || grid[y][x] === TileType.GHOST_SPAWN) return;
+    // Check for Ghost Spawn collision
+    if (grid[y][x] === TileType.GHOST_SPAWN) return false;
 
-    grid[y][x] = TileType.WALL;
+    return true;
   };
 
-  // Place obstacle blocks from OBSTACLE_POSITIONS array
-  // Edit OBSTACLE_POSITIONS at the top of this file to change obstacle placement!
-  for (const obstaclePos of OBSTACLE_POSITIONS) {
-    const blockX = Math.floor(cols * obstaclePos.x) - 1; // Center the 2x2 block
-    const blockY = Math.floor(rows * obstaclePos.y) - 1;
-    placeBlock(blockX, blockY);
+  const placeWall = (x: number, y: number) => {
+    if (canPlaceWall(x, y)) {
+      grid[y][x] = TileType.WALL;
+    }
+  };
+
+  // Place special shape obstacles with smart bounds checking and conflict avoidance
+  for (const obstacle of OBSTACLE_POSITIONS) {
+    let centerX = Math.floor(cols * obstacle.x);
+    let centerY = Math.floor(rows * obstacle.y);
+
+    // Smart adjustment: Allow touching the walls (indices 1 and cols-2)
+    const minX = 1;
+    const maxX = cols - 2;
+    const minY = 1;
+    const maxY = rows - 2;
+
+    // Helper to find a safe Y-offset if the preferred position hits a ghost
+    const findSafeY = (xArr: number[], yBase: number, height: number): number => {
+      const offsets = [0, -1, 1, -2, 2];
+      for (const off of offsets) {
+        let allClear = true;
+        for (const tx of xArr) {
+          for (let i = 0; i < height; i++) {
+            if (!canPlaceWall(tx, yBase + off + i)) allClear = false;
+          }
+        }
+        if (allClear) return yBase + off;
+      }
+      return yBase;
+    };
+
+    if (obstacle.type === 'horizontal') {
+      // 2x1 Horizontal: [X][X]
+      // Ensure X fits
+      if (centerX + 1 > maxX) centerX = maxX - 1;
+      if (centerX < minX) centerX = minX;
+
+      // Find safe Y
+      centerY = findSafeY([centerX, centerX + 1], centerY, 1);
+
+      placeWall(centerX, centerY);
+      placeWall(centerX + 1, centerY);
+    }
+    else if (obstacle.type === 'vertical') {
+      // 1x2 Vertical: [X]
+      //               [X]
+      // Ensure Y fits
+      if (centerY + 1 > maxY) centerY = maxY - 1;
+      if (centerY < minY) centerY = minY;
+
+      // Ensure X fits
+      if (centerX > maxX) centerX = maxX;
+      if (centerX < minX) centerX = minX;
+
+      // Check collision and shift if needed (simple shift logic)
+      if (!canPlaceWall(centerX, centerY) || !canPlaceWall(centerX, centerY + 1)) {
+        if (canPlaceWall(centerX, centerY - 1) && canPlaceWall(centerX, centerY)) {
+          centerY--;
+        } else if (canPlaceWall(centerX, centerY + 1) && canPlaceWall(centerX, centerY + 2)) {
+          centerY++;
+        }
+      }
+
+      placeWall(centerX, centerY);
+      placeWall(centerX, centerY + 1);
+    }
+    else if (obstacle.type === 'u-shape') {
+      // U-shape facing up
+      if (centerX + 1 > maxX) centerX = maxX - 1;
+      if (centerX - 1 < minX) centerX = minX + 1;
+
+      if (centerY < minY + 1) centerY = minY + 1;
+      if (centerY > maxY) centerY = maxY;
+
+      centerY = findSafeY([centerX - 1, centerX, centerX + 1], centerY, 1);
+
+      placeWall(centerX - 1, centerY - 1); // Top left tip
+      placeWall(centerX + 1, centerY - 1); // Top right tip
+      placeWall(centerX - 1, centerY);     // Bottom left
+      placeWall(centerX, centerY);         // Bottom middle
+      placeWall(centerX + 1, centerY);     // Bottom right
+    }
   }
 
   return grid;
