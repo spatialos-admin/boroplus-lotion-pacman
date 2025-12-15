@@ -4,6 +4,7 @@ import { INITIAL_MAP_LAYOUT, MOVEMENT_VECTORS, GAME_SPEED_MS, generateResponsive
 import { GHOST_TYPES } from '../ghostData';
 
 import { ENTITY_SIZE, GHOST_SIZE, PLAYER_WIDTH, PLAYER_HEIGHT } from '../constants';
+import victorySound from '../assets/sounds/Positive-Game-Victory.wav';
 
 const getInitialGameState = (): GameState => {
   // Use responsive map layout based on screen size
@@ -94,9 +95,9 @@ const getInitialGameState = (): GameState => {
 
   const spawnPos = getSpawnPosition();
 
-  // Create 8 ghosts total, but only activate first 4
+  // Create 8 ghosts total, but only activate first 2
   for (let i = 0; i < 8; i++) {
-    const isActive = i < 4; // First 4 are active
+    const isActive = i < 2; // First 2 are active
     const ghostType = GHOST_TYPES[i] || GHOST_TYPES[0]; // Fallback to first type if index out of bounds
 
     // For active ghosts, assign to distributed spawn points
@@ -251,6 +252,13 @@ export const useGameLogic = () => {
     const behavior = getGhostBehavior(ghost.id);
     const possibleDirs = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT];
     let validMoves: Direction[] = [];
+
+    // Global ghost speed reduction - 20% slower (skip 1 in 5 ticks)
+    const globalCounter = ghostMoveCounters.current.get('global_tick') || 0;
+    ghostMoveCounters.current.set('global_tick', globalCounter + 1);
+    if (globalCounter % 5 === 0) {
+      return ghost; // Skip this tick for all ghosts (20% slower)
+    }
 
     // Slow mover - skip every other tick
     if (behavior === 'slow') {
@@ -682,6 +690,11 @@ export const useGameLogic = () => {
               ghostWasEaten = true;
               updatedScore += 200;
 
+              // Play victory sound
+              const audio = new Audio(victorySound);
+              audio.volume = 0.5; // Set volume to 50% so it's not too loud
+              audio.play().catch(e => console.log('Audio play failed:', e));
+
               // Show message
               const ghostType = GHOST_TYPES.find(type => type.id === g.id);
               if (ghostType) {
@@ -716,9 +729,18 @@ export const useGameLogic = () => {
 
               let spawnPos = { x: Math.floor(prev.grid[0].length / 2), y: Math.floor(prev.grid.length * 0.3) }; // Fallback
               if (ghostSpawns.length > 0) {
-                // Distribute spawns
-                const spawnIndex = pendingGhostIndex % ghostSpawns.length;
-                spawnPos = ghostSpawns[spawnIndex];
+                // Find spawn point furthest from player (opposite side)
+                let maxDist = -1;
+                let furthestSpawn = ghostSpawns[0];
+
+                ghostSpawns.forEach(pos => {
+                  const dist = Math.pow(pos.x - newPlayer.pos.x, 2) + Math.pow(pos.y - newPlayer.pos.y, 2);
+                  if (dist > maxDist) {
+                    maxDist = dist;
+                    furthestSpawn = pos;
+                  }
+                });
+                spawnPos = furthestSpawn;
               }
 
               updatedGhosts[pendingGhostIndex] = {

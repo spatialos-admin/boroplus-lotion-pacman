@@ -1,5 +1,25 @@
 import { TileType } from './types';
 
+/**
+ * OBSTACLE POSITIONS - Edit this array to change obstacle placement!
+ * 
+ * Each obstacle is a 2x2 wall block positioned using percentage-based coordinates:
+ * - x: horizontal position (0 = left edge, 0.5 = center, 1 = right edge)
+ * - y: vertical position (0 = top edge, 0.5 = center, 1 = bottom edge)
+ * 
+ * The actual pixel position is calculated as: x * cols, y * rows
+ * Obstacles are automatically skipped if they overlap with:
+ * - Map borders
+ * - Text display area
+ * - Ghost spawn points
+ */
+export const OBSTACLE_POSITIONS: { x: number; y: number }[] = [
+  { x: 0.45, y: 0.45 },  // TOP-LEFT block
+  { x: 0.80, y: 0.30 },  // TOP-RIGHT block
+  { x: 0.45, y: 0.65 },  // BOTTOM-LEFT block
+  { x: 0.90, y: 0.65 },  // BOTTOM-RIGHT block
+];
+
 export const ENTITY_SIZE = 6; // Base player size in blocks
 export const GHOST_SIZE = 1.5; // Ghosts are 2x2 blocks (2x bigger)
 
@@ -28,7 +48,7 @@ export const generateResponsiveMapLayout = (availableWidth?: number, availableHe
     // This forces the generator to prefer WIDER maps (more cols, fewer rows), which helps fill the width 
     // and solves the "side gaps" issue when the map is otherwise height-bound.
     const headerHeight = 85; // Increased from 64
-    const controlsHeight = 180; // Increased from 120 to be very safe regarding bottom UI/safe-area
+    const controlsHeight = 140; // Reduced from 180 - D-pad is now 20% smaller
     const padding = 8; // Tighter padding assumption
 
     // Max width clamp
@@ -309,52 +329,28 @@ const generateMapLayout = (cols: number, rows: number): number[][] => {
   // Add 4 simple obstacle blocks - one on each side of the map
   // Each block is 2x2 (4 tiles total), positioned with enough clearance for bottle (4x6)
 
-  // Helper function to place a 2x2 wall block
-  const placeBlock = (startX: number, startY: number): void => {
-    for (let dy = 0; dy < 2; dy++) {
-      for (let dx = 0; dx < 2; dx++) {
-        const x = startX + dx;
-        const y = startY + dy;
+  // Helper function to place a single wall block (1 tile only)
+  const placeBlock = (x: number, y: number): void => {
+    // Skip if out of bounds (must be at least 2 tiles from border for clearance)
+    if (x <= 1 || x >= cols - 2 || y <= 1 || y >= rows - 2) return;
 
-        // Skip if out of bounds
-        if (x <= 0 || x >= cols - 1 || y <= 0 || y >= rows - 1) continue;
+    // Skip if in text area
+    if (y >= textAreaStartRow && y < textAreaEndRow &&
+      x >= textAreaStartCol && x < textAreaEndCol) return;
 
-        // Skip if in text area
-        if (y >= textAreaStartRow && y < textAreaEndRow &&
-          x >= textAreaStartCol && x < textAreaEndCol) continue;
+    // Skip if already a special tile
+    if (grid[y][x] === TileType.WALL || grid[y][x] === TileType.GHOST_SPAWN) return;
 
-        // Skip if near ghost spawn (reduced to 2 tiles)
-        if (ghostSpawns.some(s => Math.abs(s.x - x) < 2 && Math.abs(s.y - y) < 2)) continue;
-
-        // Skip if already a special tile
-        if (grid[y][x] === TileType.WALL || grid[y][x] === TileType.GHOST_SPAWN) continue;
-
-        grid[y][x] = TileType.WALL;
-      }
-    }
+    grid[y][x] = TileType.WALL;
   };
 
-  // Calculate positions for the 4 blocks
-  const centerX = Math.floor(cols / 2);
-  const centerY = Math.floor(rows / 2);
-
-  // Always place the 4 blocks - positioned by percentage of map size
-
-  // TOP block - centered horizontally, in upper third
-  const topBlockY = Math.floor(rows * 0.3);
-  placeBlock(centerX - 1, topBlockY);
-
-  // BOTTOM block - centered horizontally, in lower third
-  const bottomBlockY = Math.floor(rows * 0.75);
-  placeBlock(centerX - 1, bottomBlockY);
-
-  // LEFT block - centered vertically, on left side
-  const leftBlockX = Math.floor(cols * 0.2);
-  placeBlock(leftBlockX, centerY - 1);
-
-  // RIGHT block - centered vertically, on right side
-  const rightBlockX = Math.floor(cols * 0.8) - 2;
-  placeBlock(rightBlockX, centerY - 1);
+  // Place obstacle blocks from OBSTACLE_POSITIONS array
+  // Edit OBSTACLE_POSITIONS at the top of this file to change obstacle placement!
+  for (const obstaclePos of OBSTACLE_POSITIONS) {
+    const blockX = Math.floor(cols * obstaclePos.x) - 1; // Center the 2x2 block
+    const blockY = Math.floor(rows * obstaclePos.y) - 1;
+    placeBlock(blockX, blockY);
+  }
 
   return grid;
 };

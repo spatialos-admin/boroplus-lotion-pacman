@@ -5,6 +5,8 @@ import { Ghost as GhostIcon, Milk } from 'lucide-react';
 import lotionImage from '../assets/images/BP-lotion.png';
 import { ENTITY_SIZE, GHOST_SIZE, PLAYER_WIDTH, PLAYER_HEIGHT } from '../constants';
 import { getGhostTypeById } from '../ghostData';
+import skinRescueImage from '../assets/images/Skin-Rescue-Image.png';
+import boroplusImage from '../assets/images/boroplus.jpeg';
 
 interface GameScreenProps {
   gameState: GameState;
@@ -107,9 +109,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ gameState }) => {
           ))}
         </div>
 
-        <div className="bg-gradient-to-r from-yellow-400 to-orange-500 px-2 sm:px-3 py-0.5 sm:py-1 rounded-md border sm:border-2 border-red-600 shadow-lg transform -skew-x-6">
-          <h1 className="text-black font-extrabold text-[8px] sm:text-xs pixel-font tracking-tighter drop-shadow-sm whitespace-nowrap">SKIN RESCUE</h1>
-        </div>
+        <img src={skinRescueImage} alt="Skin Rescue" className="h-8 sm:h-10 object-contain" />
 
         <div className="flex items-center gap-1 sm:gap-2">
           <span className="text-white font-mono text-[10px] sm:text-xs font-bold">SCORE</span>
@@ -158,7 +158,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ gameState }) => {
           {/* Text Overlay - Positioned over the open area */}
           {gameState.activeMessage && (
             <div className="absolute top-[10%] left-[10%] w-[80%] text-center pointer-events-none z-30 animate-in fade-in zoom-in duration-200">
-              <h2 className="pixel-font text-yellow-300 text-sm tracking-widest drop-shadow-[0_0_10px_rgba(253,224,71,0.5)] leading-tight shadow-black drop-shadow-md">
+              <h2 className="pixel-font text-yellow-300 text-xl sm:text-2xl tracking-widest drop-shadow-[0_0_10px_rgba(253,224,71,0.5)] leading-tight shadow-black drop-shadow-md">
                 {gameState.activeMessage}
               </h2>
             </div>
@@ -236,8 +236,9 @@ const GameScreen: React.FC<GameScreenProps> = ({ gameState }) => {
       )}
 
       {status === GameStatus.WON && (
-        <div className="absolute inset-0 bg-yellow-400/90 flex items-center justify-center z-50">
-          <h2 className="text-black font-bold text-2xl pixel-font drop-shadow-md">MOISTURIZED!</h2>
+        <div className="absolute inset-0 bg-black/90 flex items-center justify-center flex-col z-50">
+          <img src={boroplusImage} alt="BoroPlus" className="max-w-[100%] max-h-[60%] object-contain mb-4 rounded-lg shadow-lg" />
+          <h2 className="text-yellow-400 font-bold text-2xl pixel-font drop-shadow-md">MOISTURIZED!</h2>
         </div>
       )}
 
