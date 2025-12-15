@@ -136,6 +136,7 @@ const getInitialGameState = (): GameState => {
 export const useGameLogic = () => {
   const [gameState, setGameState] = useState<GameState>(getInitialGameState());
   const tickRef = useRef<number | null>(null);
+  const winSequenceTriggered = useRef(false);
 
   const setDirection = useCallback((dir: Direction) => {
     if (gameState.status !== GameStatus.PLAYING && gameState.status !== GameStatus.IDLE) return;
@@ -152,6 +153,7 @@ export const useGameLogic = () => {
   }, [gameState.status]);
 
   const restartGame = useCallback(() => {
+    winSequenceTriggered.current = false;
     setGameState(getInitialGameState());
   }, []);
 
@@ -756,7 +758,14 @@ export const useGameLogic = () => {
           // Win condition: All ghosts are eaten
           const allGhostsEaten = updatedGhosts.every(g => g.isEaten);
           if (allGhostsEaten) {
-            newStatus = GameStatus.WON;
+            if (!winSequenceTriggered.current) {
+              winSequenceTriggered.current = true;
+              // Delay showing win screen by 1 second
+              setTimeout(() => {
+                setGameState(current => ({ ...current, status: GameStatus.WON }));
+              }, 1000);
+            }
+            // Do not set newStatus = GameStatus.WON directly here anymore
           }
 
           // Just to be safe, if we ran out of pellets (original logic), we effectively win too, 
