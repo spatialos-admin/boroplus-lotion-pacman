@@ -14,13 +14,13 @@ import { TileType } from './types';
  * - Ghost spawn points
  */
 export const OBSTACLE_POSITIONS: { x: number; y: number }[] = [
-  { x: 0.45, y: 0.45 },  // TOP-LEFT block
-  { x: 0.80, y: 0.30 },  // TOP-RIGHT block
+  { x: 0.45, y: 0.40 },  // TOP-LEFT block
+  { x: 0.90, y: 0.30 },  // TOP-RIGHT block
   { x: 0.45, y: 0.65 },  // BOTTOM-LEFT block
   { x: 0.90, y: 0.65 },  // BOTTOM-RIGHT block
 ];
 
-export const ENTITY_SIZE = 6; // Base player size in blocks
+export const ENTITY_SIZE = 5; // Base player size in blocks
 export const GHOST_SIZE = 1.5; // Ghosts are 2x2 blocks (2x bigger)
 
 // Player dimensions based on image aspect ratio (bottle is typically taller than wide)
