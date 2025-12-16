@@ -54,7 +54,7 @@ export const GHOST_TYPES: GhostType[] = [
   },
   {
     id: 'g7',
-    name: 'Tight Skin',
+    name: 'Inelastic Skin',
     image: tightSkinImage,
     color: '#9B59B6',
   },

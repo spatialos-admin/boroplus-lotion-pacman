@@ -3,6 +3,7 @@ import { useGameLogic } from '../hooks/useGameLogic';
 import DPad from './DPad';
 import GameScreen from './GameScreen';
 import { Direction } from '../types';
+import bpLogo from '../assets/images/BP-Logo.png';
 
 const Gameboy: React.FC = () => {
   const { gameState, setDirection, restartGame, startGame } = useGameLogic();
@@ -63,6 +64,13 @@ const Gameboy: React.FC = () => {
       {/* Side buttons (Volume/Power) - Hidden on mobile */}
       <div className="hidden sm:block absolute -left-[4px] top-40 w-[4px] h-12 rounded-l-md border-l" style={{ backgroundColor: '#0a0a0a', borderColor: '#0a0a0a' }}></div>
       <div className="hidden sm:block absolute -right-[4px] top-40 w-[4px] h-16 rounded-r-md border-r" style={{ backgroundColor: '#0a0a0a', borderColor: '#0a0a0a' }}></div>
+
+      {/* Brand Logo - Outside Game Screen */}
+      <img 
+        src={bpLogo} 
+        alt="BoroPlus Logo" 
+        className="absolute bottom-4 right-4 w-16 sm:w-24 h-auto object-contain z-30 opacity-90 pointer-events-none drop-shadow-lg mix-blend-screen" 
+      />
     </div>
   );
 };

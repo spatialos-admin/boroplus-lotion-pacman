@@ -101,7 +101,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ gameState, onStart }) => {
 
   return (
     <div ref={containerRef} className="relative w-full h-full bg-black overflow-hidden rounded-lg border-2 border-purple-900 flex flex-col">
-
+      
       {/* Header Section */}
       <div className="h-12 sm:h-16 w-full flex items-center justify-between px-1 sm:px-2 pt-1 sm:pt-2 bg-black z-20 shrink-0">
         <div className="flex gap-0.5 sm:gap-1">
@@ -109,7 +109,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ gameState, onStart }) => {
             <GhostIcon key={i} size={12} fill={c} color={c} className="sm:w-4 sm:h-4 drop-shadow-sm" />
           ))}
         </div>
-
+        
         <img src={skinRescueImage} alt="Skin Rescue" className="h-8 sm:h-10 object-contain" />
 
         <div className="flex items-center gap-1 sm:gap-2">
@@ -121,7 +121,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ gameState, onStart }) => {
       {/* Game Area */}
       <div className="relative flex-1 w-full bg-black flex items-center justify-center overflow-hidden">
         {/* Game Grid Container - relative positioning for entities */}
-        <div
+        <div 
           className="relative"
           style={{
             width: `${grid[0].length * blockSize}px`,
@@ -134,51 +134,51 @@ const GameScreen: React.FC<GameScreenProps> = ({ gameState, onStart }) => {
             style={{
               gridTemplateColumns: `repeat(${grid[0].length}, ${blockSize}px)`,
               gridTemplateRows: `repeat(${grid.length}, ${blockSize}px)`,
-            }}
-          >
-            {grid.map((row, y) => (
-              row.map((cell, x) => {
-                const isWall = cell === TileType.WALL;
-                return (
-                  <div key={`${x}-${y}`} className="relative flex items-center justify-center">
-                    {isWall && (
-                      <div className="w-[80%] h-[80%] rounded-md border-2 border-purple-500 shadow-[0_0_6px_#a855f7] bg-transparent"></div>
-                    )}
-
-                    {cell === TileType.PELLET && (
-                      <div
+          }}
+        >
+          {grid.map((row, y) => (
+            row.map((cell, x) => {
+              const isWall = cell === TileType.WALL;
+              return (
+                <div key={`${x}-${y}`} className="relative flex items-center justify-center">
+                  {isWall && (
+                    <div className="w-[80%] h-[80%] rounded-md border-2 border-purple-500 shadow-[0_0_6px_#a855f7] bg-transparent"></div>
+                  )}
+                  
+                  {cell === TileType.PELLET && (
+                    <div 
                         className="w-[15%] h-[15%] rounded-full bg-white shadow-[0_0_4px_white]"
-                      ></div>
-                    )}
-                  </div>
-                );
-              })
-            ))}
-          </div>
+                    ></div>
+                  )}
+                </div>
+              );
+            })
+          ))}
+        </div>
 
           {/* Text Overlay - Positioned over the open area */}
           {gameState.activeMessage && (
             <div className="absolute top-[10%] left-[10%] w-[80%] text-center pointer-events-none z-30 animate-in fade-in zoom-in duration-200">
               <h2 className="pixel-font text-yellow-300 text-xl sm:text-2xl tracking-widest drop-shadow-[0_0_10px_rgba(253,224,71,0.5)] leading-tight shadow-black drop-shadow-md">
                 {gameState.activeMessage}
-              </h2>
-            </div>
+          </h2>
+          </div>
           )}
 
-          {/* Entities Layer - Sized to 2x2 blocks */}
-
-          {/* Player */}
-          <div
+        {/* Entities Layer - Sized to 2x2 blocks */}
+        
+        {/* Player */}
+        <div
             className="absolute z-20"
-            style={{
+          style={{
               width: `${PLAYER_WIDTH * blockSize}px`,  // Player width in blocks
               height: `${PLAYER_HEIGHT * blockSize}px`,     // Player height in blocks
               left: `${player.pos.x * blockSize}px`,
               top: `${player.pos.y * blockSize}px`,
               transition: 'left 180ms linear, top 180ms linear',
               willChange: 'left, top',
-            }}
-          >
+          }}
+        >
             <div className="w-full h-full p-0 flex items-center justify-center overflow-visible">
               <div className="w-full h-full relative">
                 <img
@@ -194,9 +194,9 @@ const GameScreen: React.FC<GameScreenProps> = ({ gameState, onStart }) => {
                     }
                   }}
                 />
-              </div>
-            </div>
+               </div>
           </div>
+        </div>
 
           {/* Ghosts - Only render active ghosts */}
           {ghosts.filter(g => g.isActive !== false).map((ghost) => {
@@ -204,10 +204,10 @@ const GameScreen: React.FC<GameScreenProps> = ({ gameState, onStart }) => {
             const ghostImage = ghostType?.image || '';
 
             return (
-              <div
-                key={ghost.id}
+          <div
+              key={ghost.id}
                 className="absolute z-20"
-                style={{
+              style={{
                   width: `${GHOST_SIZE * blockSize}px`,  // GHOST_SIZE blocks wide
                   height: `${GHOST_SIZE * blockSize}px`,     // GHOST_SIZE blocks high
                   left: `${ghost.pos.x * blockSize}px`,
@@ -215,18 +215,18 @@ const GameScreen: React.FC<GameScreenProps> = ({ gameState, onStart }) => {
                   transition: 'left 180ms linear, top 180ms linear',
                   willChange: 'left, top',
                 }}
-              >
+                   >
                 <div className="w-full h-full p-0 flex items-center justify-center overflow-visible">
                   <img
                     src={ghostImage}
                     alt={ghostType?.name || 'Ghost'}
                     className="w-full h-full object-contain"
                   />
-                </div>
-              </div>
+                      </div>
+                   </div>
             );
           })}
-        </div>
+          </div>
       </div>
 
       {/* Overlays */}
@@ -235,14 +235,14 @@ const GameScreen: React.FC<GameScreenProps> = ({ gameState, onStart }) => {
           <h2 className="text-red-500 font-bold text-2xl mb-2 pixel-font tracking-tighter shadow-black drop-shadow-md">GAME OVER</h2>
         </div>
       )}
-
+      
       {status === GameStatus.WON && (
         <div className="absolute inset-0 bg-black/90 flex items-center justify-center flex-col z-50">
           <img src={boroplusImage} alt="BoroPlus" className="max-w-[100%] max-h-[60%] object-contain mb-4 rounded-lg shadow-lg" />
           <h2 className="text-yellow-400 font-bold text-2xl pixel-font drop-shadow-md">MOISTURIZED!</h2>
         </div>
       )}
-
+      
       {status === GameStatus.IDLE && (
         <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm flex-col gap-8">
           <p className="text-white font-bold text-xs pixel-font animate-pulse text-center leading-loose tracking-widest">
