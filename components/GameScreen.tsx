@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { GameState, TileType, GameStatus } from '../types';
 import { COLORS } from '../constants';
 import { Ghost as GhostIcon, Milk, Play } from 'lucide-react';
-import lotionImage from '../assets/images/BoroPlus-Final.svg';
+import lotionImage from '../assets/images/BotoPlus-Final.png';
 import { ENTITY_SIZE, GHOST_SIZE, PLAYER_WIDTH, PLAYER_HEIGHT } from '../constants';
 import { getGhostTypeById } from '../ghostData';
 import skinRescueImage from '../assets/images/Skin-Rescue-Image.png';
