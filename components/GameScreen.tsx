@@ -239,7 +239,7 @@ const GameScreen: React.FC<GameScreenProps> = ({ gameState, onStart }) => {
       {status === GameStatus.WON && (
         <div className="absolute inset-0 bg-black/90 flex items-center justify-center flex-col z-50">
           <img src={endSlideImage} alt="BoroPlus" className="max-w-[100%] max-h-[60%] object-contain mb-4 rounded-lg shadow-lg" />
-          <h2 className="text-yellow-400 font-bold text-2xl pixel-font drop-shadow-md">MOISTURIZED!</h2>
+          <h2 className="text-yellow-400 font-bold text-2xl pixel-font drop-shadow-md">MOISTURIsED!</h2>
         </div>
       )}
       
